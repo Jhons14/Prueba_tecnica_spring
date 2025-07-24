@@ -1,0 +1,24 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+
+app:
+  api-key: products-service-api-key-123
+
+logging:
+  level:
+    com.microservices.products: DEBUG
+    org.springframework.security: DEBUG
