@@ -94,7 +94,7 @@ Product {
 - Seguimiento del historial de compras
 - Comunicación interservicios con el Servicio de Productos
 
-**Puntos finales:**
+**End Points:**
 - `GET /api/inventory/products/{productId}` - Obtener inventario por ID de producto
 - `PUT /api/inventory/products/{productId}` - Actualizar cantidad de inventario
 - `POST /api/purchases` - Procesar compra (punto final principal)
@@ -253,14 +253,14 @@ El proyecto incluye pruebas exhaustivas:
 
 ## Monitorización y Comprobaciones de Salud
 
-### Puntos finales de salud
+### End Points de salud
 
 - Servicio de productos: http://localhost:8080/actuator/health
 - Servicio de inventario: http://localhost:8081/actuator/health
 
 ### Métricas & Monitorización
 
-- **Puntos finales del actuador**: `/actuator/metrics`, `/actuator/info`
+- **End Points del actuador**: `/actuator/metrics`, `/actuator/info`
 - **Registro estructurado**: Registros en formato JSON con ID de correlación
 - **Indicadores de salud personalizados**: Comprobaciones de salud específicas del servicio
 
@@ -294,7 +294,7 @@ El proyecto incluye pruebas exhaustivas:
 
 **Justificación**
 - **Estandarización**: Formato API estándar del sector
-- **Coherencia**: Estructura de respuesta uniforme en todos los puntos finales
+- **Coherencia**: Estructura de respuesta uniforme en todos los End Points
 - **Gestión de errores**: Respuestas de error estructuradas
 - **A prueba de futuro**: Fácil integración con frameworks frontend
 
@@ -370,7 +370,7 @@ El proyecto incluye pruebas exhaustivas:
 1. **Revisión del código**: Revisión manual de todo el código generado para las mejores prácticas
 2. **Ejecución de pruebas**: Todas las pruebas generadas ejecutadas y validadas
 3. **Pruebas de integración**: Pruebas manuales de las interacciones de los servicios
-4. **Validación del rendimiento**: Pruebas básicas de carga de puntos finales críticos.
+4. **Validación del rendimiento**: Pruebas básicas de carga de End Points críticos.
 5. **Revisión de seguridad**: Validación de autenticación y autorización de API
 
 ---
