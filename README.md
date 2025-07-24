@@ -150,10 +150,10 @@ Purchase {
 
 ### Tratamiento de errores
 
-- Producto no encontrado (404)\*\*: Cuando el producto no existe en el Servicio de Productos
-- Inventario insuficiente (400)\*\*: Cuando la cantidad solicitada excede el stock disponible
-- Errores de validación (400)\*\*: Datos de entrada no válidos
-- Errores de comunicación del servicio (500)\*\*: Servicio de productos no disponible
+- **Producto no encontrado (404)**: Cuando el producto no existe en el Servicio de Productos
+- **Inventario insuficiente (400)**: Cuando la cantidad solicitada excede el stock disponible
+- **Errores de validación (400)**: Datos de entrada no válidos
+- **Errores de comunicación del servicio (500)**: Servicio de productos no disponible
 
 ## Instalación y configuración
 
