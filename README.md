@@ -71,7 +71,7 @@ Client Request ──► Inventory Service ──► Products Service
 - Recuperación de información de productos
 - Mantenimiento del catálogo de productos
 
-**Puntos finales:**
+**End Points:**
 - `POST /api/products` - Crear un nuevo producto
 - `GET /api/products/{id}` - Obtener producto por ID
 - `GET /api/products` - Listar todos los productos
