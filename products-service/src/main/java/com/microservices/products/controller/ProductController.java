@@ -3,6 +3,7 @@ package com.microservices.products.controller;
 import com.microservices.products.dto.JsonApiError;
 import com.microservices.products.dto.JsonApiResponse;
 import com.microservices.products.dto.ProductDto;
+import com.microservices.products.dto.ProductCreateDto;
 import com.microservices.products.model.Product;
 import com.microservices.products.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +40,7 @@ public class ProductController {
     @ApiResponse(responseCode = "201", description = "Product created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
     public ResponseEntity<JsonApiResponse<ProductDto>> createProduct(
-            @Valid @RequestBody ProductDto request) {
+            @Valid @RequestBody ProductCreateDto request) {
 
         Product product = new Product(
             request.getAttributes().getName(),

@@ -3,6 +3,7 @@ package com.microservices.products.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservices.products.dto.JsonApiResponse;
 import com.microservices.products.dto.ProductDto;
+import com.microservices.products.dto.ProductCreateDto;
 import com.microservices.products.model.Product;
 import com.microservices.products.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ class ProductControllerTest {
 
     private Product testProduct;
     private ProductDto testProductDto;
-    private ProductDto requestBody;
+    private ProductCreateDto requestBody;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +49,7 @@ class ProductControllerTest {
 
         testProductDto = new ProductDto("1", "Test Product", new BigDecimal("19.99"), "Test Description");
 
-        requestBody = testProductDto;
+        requestBody = new ProductCreateDto("Test Product", new BigDecimal("19.99"), "Test Description");
     }
 
     @Test
@@ -120,7 +121,7 @@ class ProductControllerTest {
     @Test
     @WithMockUser
     void createProduct_WithNegativePrice_ShouldReturnValidationError() throws Exception {
-        ProductDto invalidProductDto = new ProductDto(null, "Test Product", new BigDecimal("-1.00"), "Test Description");
+        ProductCreateDto invalidProductDto = new ProductCreateDto("Test Product", new BigDecimal("-1.00"), "Test Description");
 
         mockMvc.perform(post("/api/products")
                 .with(csrf())
@@ -135,7 +136,7 @@ class ProductControllerTest {
     @Test
     @WithMockUser
     void createProduct_WithZeroPrice_ShouldReturnValidationError() throws Exception {
-        ProductDto invalidProductDto = new ProductDto(null, "Test Product", new BigDecimal("0.00"), "Test Description");
+        ProductCreateDto invalidProductDto = new ProductCreateDto("Test Product", new BigDecimal("0.00"), "Test Description");
 
         mockMvc.perform(post("/api/products")
                 .with(csrf())
