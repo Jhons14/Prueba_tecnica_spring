@@ -39,7 +39,7 @@ class ProductControllerTest {
 
     private Product testProduct;
     private ProductDto testProductDto;
-    private JsonApiResponse<ProductDto> requestBody;
+    private ProductDto requestBody;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +48,7 @@ class ProductControllerTest {
 
         testProductDto = new ProductDto("1", "Test Product", new BigDecimal("19.99"), "Test Description");
 
-        requestBody = JsonApiResponse.success(testProductDto);
+        requestBody = testProductDto;
     }
 
     @Test
@@ -115,5 +115,35 @@ class ProductControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void createProduct_WithNegativePrice_ShouldReturnValidationError() throws Exception {
+        ProductDto invalidProductDto = new ProductDto(null, "Test Product", new BigDecimal("-1.00"), "Test Description");
+
+        mockMvc.perform(post("/api/products")
+                .with(csrf())
+                .header("X-API-Key", "products-service-api-key-123")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidProductDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].status").value("400"))
+                .andExpect(jsonPath("$.errors[0].title").value("Validation Error"));
+    }
+
+    @Test
+    @WithMockUser
+    void createProduct_WithZeroPrice_ShouldReturnValidationError() throws Exception {
+        ProductDto invalidProductDto = new ProductDto(null, "Test Product", new BigDecimal("0.00"), "Test Description");
+
+        mockMvc.perform(post("/api/products")
+                .with(csrf())
+                .header("X-API-Key", "products-service-api-key-123")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidProductDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].status").value("400"))
+                .andExpect(jsonPath("$.errors[0].title").value("Validation Error"));
     }
 }

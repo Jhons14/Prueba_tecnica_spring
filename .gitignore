@@ -34,7 +34,8 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
-
+.CLAUDE.md
+.claude
 # IntelliJ IDEA
 .idea/
 *.iws

@@ -85,7 +85,7 @@ public class InventoryController {
     @ApiResponse(responseCode = "404", description = "Product not found")
     public ResponseEntity<JsonApiResponse<InventoryDto>> updateInventoryQuantity(
             @PathVariable Long productId,
-            @Valid @RequestBody JsonApiResponse<InventoryDto> request,
+            @Valid @RequestBody InventoryDto request,
             BindingResult bindingResult) {
         
         if (bindingResult.hasErrors()) {
@@ -105,7 +105,7 @@ public class InventoryController {
                     .body(JsonApiResponse.error(errors));
             }
 
-            Integer newQuantity = request.getData().getAttributes().getQuantity();
+            Integer newQuantity = request.getAttributes().getQuantity();
             Inventory updatedInventory = inventoryService.updateInventoryQuantity(productId, newQuantity);
             
             InventoryDto inventoryDto = new InventoryDto(

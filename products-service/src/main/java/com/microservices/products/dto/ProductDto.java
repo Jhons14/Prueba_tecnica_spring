@@ -1,6 +1,7 @@
 package com.microservices.products.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,6 +11,8 @@ import java.math.BigDecimal;
 public class ProductDto {
     private String type = "product";
     private String id;
+    @Valid
+    @NotNull(message = "Attributes are required")
     private ProductAttributes attributes;
 
     public ProductDto() {}

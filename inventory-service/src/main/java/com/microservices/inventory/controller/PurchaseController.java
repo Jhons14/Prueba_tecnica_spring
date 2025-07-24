@@ -40,7 +40,7 @@ public class PurchaseController {
     @ApiResponse(responseCode = "400", description = "Invalid input or insufficient inventory")
     @ApiResponse(responseCode = "404", description = "Product not found")
     public ResponseEntity<JsonApiResponse<PurchaseDto>> processPurchase(
-            @Valid @RequestBody JsonApiResponse<PurchaseRequestDto> request,
+            @Valid @RequestBody PurchaseRequestDto request,
             BindingResult bindingResult) {
         
         if (bindingResult.hasErrors()) {
@@ -51,9 +51,8 @@ public class PurchaseController {
         }
 
         try {
-            PurchaseRequestDto purchaseRequest = request.getData();
-            Long productId = purchaseRequest.getAttributes().getProductId();
-            Integer quantity = purchaseRequest.getAttributes().getQuantity();
+            Long productId = request.getAttributes().getProductId();
+            Integer quantity = request.getAttributes().getQuantity();
 
             Purchase purchase = purchaseService.processPurchase(productId, quantity);
             ProductInfo productInfo = inventoryService.getProductInfo(productId);

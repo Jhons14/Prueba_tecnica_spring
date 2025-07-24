@@ -39,41 +39,24 @@ public class ProductController {
     @ApiResponse(responseCode = "201", description = "Product created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
     public ResponseEntity<JsonApiResponse<ProductDto>> createProduct(
-            @Valid @RequestBody JsonApiResponse<ProductDto> request, BindingResult bindingResult) {
-        
-        if (bindingResult.hasErrors()) {
-            List<JsonApiError> errors = bindingResult.getFieldErrors().stream()
-                .map(error -> new JsonApiError("400", "Validation Error", error.getDefaultMessage()))
-                .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(JsonApiResponse.error(errors));
-        }
+            @Valid @RequestBody ProductDto request) {
 
-        try {
-            ProductDto productDto = request.getData();
-            Product product = new Product(
-                productDto.getAttributes().getName(),
-                productDto.getAttributes().getPrice(),
-                productDto.getAttributes().getDescription()
-            );
+        Product product = new Product(
+            request.getAttributes().getName(),
+            request.getAttributes().getPrice(),
+            request.getAttributes().getDescription()
+        );
 
-            Product createdProduct = productService.createProduct(product);
-            ProductDto responseDto = new ProductDto(
-                createdProduct.getId().toString(),
-                createdProduct.getName(),
-                createdProduct.getPrice(),
-                createdProduct.getDescription()
-            );
+        Product createdProduct = productService.createProduct(product);
+        ProductDto responseDto = new ProductDto(
+            createdProduct.getId().toString(),
+            createdProduct.getName(),
+            createdProduct.getPrice(),
+            createdProduct.getDescription()
+        );
 
-            return ResponseEntity.status(HttpStatus.CREATED)
-                .body(JsonApiResponse.success(responseDto));
-        } catch (Exception e) {
-            logger.error("Error creating product", e);
-            List<JsonApiError> errors = List.of(
-                new JsonApiError("500", "Internal Server Error", "Failed to create product")
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(JsonApiResponse.error(errors));
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(JsonApiResponse.success(responseDto));
     }
 
     @GetMapping("/{id}")
