@@ -67,16 +67,19 @@ Client Request ──► Inventory Service ──► Products Service
 ### 1. Servicio de Productos (Puerto 8080)
 
 **Responsabilidades:**
+
 - Creación y gestión de productos
 - Recuperación de información de productos
 - Mantenimiento del catálogo de productos
 
 **End Points:**
+
 - `POST /api/products` - Crear un nuevo producto
 - `GET /api/products/{id}` - Obtener producto por ID
 - `GET /api/products` - Listar todos los productos
 
 **Model:**
+
 ```java
 Product {
  Long id;
@@ -89,17 +92,20 @@ Product {
 ### 2. Servicio de Inventario (Puerto 8081)
 
 **Responsabilidades:**
+
 - Gestión de la cantidad de inventario
 - Procesamiento de compras (ubicación elegida)
 - Seguimiento del historial de compras
 - Comunicación interservicios con el Servicio de Productos
 
 **End Points:**
+
 - `GET /api/inventory/products/{productId}` - Obtener inventario por ID de producto
 - `PUT /api/inventory/products/{productId}` - Actualizar cantidad de inventario
 - `POST /api/purchases` - Procesar compra (punto final principal)
 
 **Models:**
+
 ```java
 Inventory {
  Long id;
@@ -123,6 +129,7 @@ Purchase {
 **Ubicación elegida: Servicio de Inventario**
 
 **Justificación:**
+
 1. **Responsabilidad única**: El servicio de inventario es el propietario de la gestión de existencias
 2. **Consistencia de los datos**: Las actualizaciones de compras e inventario se producen en la misma transacción
 3. **Acoplamiento reducido**: El servicio de productos sigue centrado en la gestión de productos
@@ -149,44 +156,31 @@ Purchase {
 
 ### Tratamiento de errores
 
-- Producto no encontrado (404)**: Cuando el producto no existe en el Servicio de Productos
-- Inventario insuficiente (400)**: Cuando la cantidad solicitada excede el stock disponible
-- Errores de validación (400)**: Datos de entrada no válidos
-- Errores de comunicación del servicio (500)**: Servicio de productos no disponible
+- Producto no encontrado (404)\*\*: Cuando el producto no existe en el Servicio de Productos
+- Inventario insuficiente (400)\*\*: Cuando la cantidad solicitada excede el stock disponible
+- Errores de validación (400)\*\*: Datos de entrada no válidos
+- Errores de comunicación del servicio (500)\*\*: Servicio de productos no disponible
 
 ## Instalación y configuración
 
 ### Requisitos previos
 
-- Java 17+
-- Maven 3.8+
 - Docker y Docker Compose
 
 ### Configuración de desarrollo local
 
 1. **Clone el repositorio**
- ```bash
- git clone <repository-url>
- cd spring-microservices
- ```
 
-2. **Construir los servicios**
- ```bash
-   # Servicio de productos
- cd products-service
- mvn clean package
- cd ..
-   
-   # Inventory Service
- cd inventory-service
- mvn clean package
- cd ..
- ```
+```bash
+git clone <repository-url>
+cd spring-microservices
+```
 
-3. **Ejecutar con Docker Compose**
- ```bash
- docker-compose up --build
- ```
+2. **Ejecutar con Docker Compose**
+
+```bash
+docker-compose up --build
+```
 
 4. **Verificar que los servicios se están ejecutando**
    - Servicio de productos: http://localhost:8080/actuator/health
@@ -195,16 +189,18 @@ Purchase {
 ### Configuración Manual (Desarrollo)
 
 1. **Iniciar el servicio de productos**
- ```bash
- cd products-service
- mvn spring-boot:run
- ```
+
+```bash
+cd products-service
+mvn spring-boot:run
+```
 
 2.  **Iniciar Servicio de Inventario**
- ```bash
- cd inventory-service
- mvn spring-boot:run
- ```
+
+```bash
+cd inventory-service
+mvn spring-boot:run
+```
 
 ## Documentación API
 
@@ -217,12 +213,10 @@ Una vez que los servicios se estén ejecutando, acceda a la documentación inter
 
 ### Autenticación
 
-
 Todos API endpoints requieren la autenticación de la clave de la API mediante el encabezado `X-API-Key`:
 
 - Servicio de productos `products-service-api-key-123`.
 - Servicio de inventario: clave API 456
-
 
 ### Cobertura de las pruebas
 
@@ -236,11 +230,13 @@ El proyecto incluye pruebas exhaustivas:
 ### Categorías de pruebas
 
 1. **Pruebas de gestión de productos**
+
    - Validación de la creación de productos
    - Funcionalidad de recuperación de productos
    - Escenarios de gestión de errores
 
 2. **Pruebas de gestión de inventario**
+
    - Actualizaciones y consultas de inventario
    - Comprobación de la disponibilidad de existencias
    - Comunicación entre servicios
@@ -270,13 +266,12 @@ El proyecto incluye pruebas exhaustivas:
 - **Producción**: Registro basado en archivos con rotación
 - **Formato**: Registro estructurado con marcas de tiempo y contexto de servicio
 
-
-
 ## Decisiones técnicas
 
 ### 1. Elección de base de datos: Base de datos H2 SQL
 
 **Justificación**
+
 - **Datos estructurados**: Modelo relacional claro (Productos ↔ Inventario ↔ Compras).
 - **Cumplimiento deACID**: Esencial para las transacciones de compra
 - **Simplicidad de desarrollo**: Cero configuración, pruebas sencillas
@@ -285,6 +280,7 @@ El proyecto incluye pruebas exhaustivas:
 ### 2. Ubicación del end point de compra: Servicio de Inventario
 
 **Justificación**
+
 - **Alineación de la lógica de negocio**: La compra es fundamentalmente una operación de inventario
 - **Consistencia de datos**: Una única transacción para la actualización del inventario y la creación de la compra
 - **Límites del servicio**: Mantiene responsabilidades de servicio claras
@@ -293,6 +289,7 @@ El proyecto incluye pruebas exhaustivas:
 ### 3. Implementación del estándar API JSON
 
 **Justificación**
+
 - **Estandarización**: Formato API estándar del sector
 - **Coherencia**: Estructura de respuesta uniforme en todos los End Points
 - **Gestión de errores**: Respuestas de error estructuradas
@@ -301,6 +298,7 @@ El proyecto incluye pruebas exhaustivas:
 ### 4. Autenticación mediante clave API
 
 **Justificación**
+
 - **Simplicidad**: Fácil de implementar y probar
 - **Servicio-a-Servicio**: Apropiado para la comunicación entre microservicios
 - **Sin estado**: No requiere gestión de sesiones
@@ -309,16 +307,17 @@ El proyecto incluye pruebas exhaustivas:
 ### 5. Estrategia de tiempo de espera y reintento
 
 **Implementación:**
+
 - **Tiempo de espera del cliente HTTP**: Tiempo de espera de 10 segundos para llamadas de servicio
 - **Lógica de reintentos**: 3 intentos de reintento con backoff exponencial
 - **Patrón de interrupción del circuito**: Listo para ser implementado si es necesario
 
 ## AI Tools Usage
 
-
 ### Herramientas utilizadas
 
 1. **Código Claude (Asistente principal)**
+
    - **Diseño de la arquitectura**: Estructura de microservicios y patrones de comunicación
    - **Generación de código**: Implementaciones completas de servicios siguiendo las mejores prácticas
    - **Creación de pruebas**: Completas suites de pruebas unitarias y de integración
@@ -327,16 +326,19 @@ El proyecto incluye pruebas exhaustivas:
 2. **Métodos de verificación de la calidad del código**
 
    **Análisis estático**
+
    - Revisión del código para las mejores prácticas de Spring Boot
    - Verificación de implementación de patrones de diseño
    - Evaluación de vulnerabilidades de seguridad
 
    **Verificación de pruebas**
+
    - Análisis de cobertura de pruebas unitarias
    - Validación de escenarios de pruebas de integración
    - Corrección de la implementación simulada
 
    **Revisión arquitectónica:**
+
    - Validación de los límites del servicio
    - Comprobación de la coherencia del diseño de la API
    - Normalización del diseño de la base de datos
@@ -344,22 +346,24 @@ El proyecto incluye pruebas exhaustivas:
 ### Contribuciones específicas de AI
 
 1. **Implementación de servicios**
+
    - Generación de controladores REST completos con conformidad API JSON
    - Implementación de la gestión integral de errores
    - Creada capa de servicio robusta con gestión de transacciones
 
 2. **Estrategia de pruebas**
+
    - Generación de pruebas unitarias que cubren todos los escenarios de lógica de negocio
    - Creación de pruebas de integración para flujos de trabajo integrales
    - Implementación de constructores de datos de prueba y accesorios
 
 3. **Configuración y DevOps**
+
    - Configuración de contenedores Docker
    - Configuración de registro con perfiles específicos del entorno
    - Implementación de Health Check
 
 4. **Documentación**
-
 
    - Generación de especificaciones OpenAPI
    - Creación de diagramas de arquitectura
