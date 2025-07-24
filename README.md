@@ -200,7 +200,7 @@ Purchase {
  mvn spring-boot:run
  ```
 
-2. 2. **Iniciar Servicio de Inventario**
+2.  **Iniciar Servicio de Inventario**
  ```bash
  cd inventory-service
  mvn spring-boot:run
@@ -270,11 +270,11 @@ El proyecto incluye pruebas exhaustivas:
 - **Producción**: Registro basado en archivos con rotación
 - **Formato**: Registro estructurado con marcas de tiempo y contexto de servicio
 
+
+
 ## Decisiones técnicas
 
 ### 1. Elección de base de datos: Base de datos H2 SQL
-
-
 
 **Justificación**
 - **Datos estructurados**: Modelo relacional claro (Productos ↔ Inventario ↔ Compras).
@@ -282,7 +282,7 @@ El proyecto incluye pruebas exhaustivas:
 - **Simplicidad de desarrollo**: Cero configuración, pruebas sencillas
 - **Preparado para producción**: Fácil migración a PostgreSQL/MySQL
 
-### 2. Ubicación del punto final de compra: Servicio de Inventario
+### 2. Ubicación del end point de compra: Servicio de Inventario
 
 **Justificación**
 - **Alineación de la lógica de negocio**: La compra es fundamentalmente una operación de inventario
