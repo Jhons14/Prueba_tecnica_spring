@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/inventory")
-@Tag(name = "Inventory", description = "Inventory management API")
+@Tag(name = "Inventory", description = "Inventory management API following JSON API specification")
 public class InventoryController {
     private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
     

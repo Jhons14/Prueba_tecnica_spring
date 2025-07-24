@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/purchases")
-@Tag(name = "Purchases", description = "Purchase processing API")
+@Tag(name = "Purchases", description = "Purchase processing API following JSON API specification")
 public class PurchaseController {
     private static final Logger logger = LoggerFactory.getLogger(PurchaseController.class);
     

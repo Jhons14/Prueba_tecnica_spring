@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
-@Tag(name = "Products", description = "Product management API")
+@Tag(name = "Products", description = "Product management API following JSON API specification")
 public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
     
