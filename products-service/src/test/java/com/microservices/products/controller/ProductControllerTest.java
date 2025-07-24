@@ -62,7 +62,7 @@ class ProductControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isCreated())
-                .andExpected(jsonPath("$.data.type").value("product"))
+                .andExpect(jsonPath("$.data.type").value("product"))
                 .andExpect(jsonPath("$.data.id").value("1"))
                 .andExpect(jsonPath("$.data.attributes.name").value("Test Product"))
                 .andExpect(jsonPath("$.data.attributes.price").value(19.99))
@@ -78,7 +78,7 @@ class ProductControllerTest {
                 .header("X-API-Key", "products-service-api-key-123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.type").value("product"))
-                .andExpected(jsonPath("$.data.id").value("1"))
+                .andExpect(jsonPath("$.data.id").value("1"))
                 .andExpect(jsonPath("$.data.attributes.name").value("Test Product"));
     }
 
@@ -90,7 +90,7 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/products/999")
                 .header("X-API-Key", "products-service-api-key-123"))
                 .andExpect(status().isNotFound())
-                .andExpected(jsonPath("$.errors[0].status").value("404"))
+                .andExpect(jsonPath("$.errors[0].status").value("404"))
                 .andExpect(jsonPath("$.errors[0].title").value("Not Found"));
     }
 
@@ -103,7 +103,7 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/products")
                 .header("X-API-Key", "products-service-api-key-123"))
                 .andExpect(status().isOk())
-                .andExpected(jsonPath("$.dataList").isArray())
+                .andExpect(jsonPath("$.dataList").isArray())
                 .andExpect(jsonPath("$.dataList[0].type").value("product"))
                 .andExpect(jsonPath("$.dataList[0].attributes.name").value("Test Product"));
     }
