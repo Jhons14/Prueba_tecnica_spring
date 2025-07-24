@@ -18,7 +18,7 @@ Una completa implementación de arquitectura de microservicios que incluye gesti
 ## Visión general de la arquitectura
 
 ```
-┌─────────────────┐    HTTP/JSON API    ┌─────────────────┐
+┌─────────────────┐     HTTP/JSON API    ┌─────────────────┐
 │                 │ ◄──────────────────► │                 │
 │  Products       │                      │   Inventory     │
 │  Service        │                      │   Service       │
@@ -45,9 +45,6 @@ Client Request ──► Inventory Service ──► Products Service
                          │                       │
                          ▼                       │
                   Inventory Update ◄─────────────┘
-                         │
-                         ▼
-                  Purchase History
 ```
 
 ## Technical Stack
@@ -95,7 +92,6 @@ Product {
 
 - Gestión de la cantidad de inventario
 - Procesamiento de compras (ubicación elegida)
-- Seguimiento del historial de compras
 - Comunicación interservicios con el Servicio de Productos
 
 **End Points:**
@@ -146,8 +142,6 @@ Purchase {
  ↓
 4. Si hay existencias suficientes:
    a) Disminuye la cantidad de inventario
-   b) Calcula el precio total
-   c) Crear registro de compra
    d) Devolver confirmación de compra
  ↓
 5. Si no hay existencias suficientes o no se encuentra el producto
