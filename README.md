@@ -1,21 +1,21 @@
-# Microservices Project: Products & Inventory Management
+# Proyecto de Microservicios: Gestión de Productos e Inventario
 
-A comprehensive microservices architecture implementation featuring product management and inventory control with purchase processing capabilities.
+Una completa implementación de arquitectura de microservicios que incluye gestión de productos y control de inventario con capacidades de procesamiento de compras.
 
-## Table of Contents
+## Tabla de Contenidos
 
-- [Architecture Overview](#architecture-overview)
-- [Technical Stack](#technical-stack)
-- [Services Description](#services-description)
-- [Purchase Flow Design](#purchase-flow-design)
-- [Installation & Setup](#installation--setup)
-- [API Documentation](#api-documentation)
-- [Testing](#testing)
-- [Monitoring & Health Checks](#monitoring--health-checks)
-- [Technical Decisions](#technical-decisions)
-- [AI Tools Usage](#ai-tools-usage)
+- Visión general de la arquitectura
+- Pila técnica
+- Descripción de servicios
+- Diseño del flujo de compras
+- Instalación y configuración
+- Documentación de la API
+- Pruebas
+- Supervisión y controles
+- Decisiones técnicas
+- Uso de herramientas de IA
 
-## Architecture Overview
+## Visión general de la arquitectura
 
 ```
 ┌─────────────────┐    HTTP/JSON API    ┌─────────────────┐
@@ -52,396 +52,335 @@ Client Request ──► Inventory Service ──► Products Service
 
 ## Technical Stack
 
-- **Framework**: Spring Boot 3.2.2
-- **Language**: Java 17
-- **Database**: H2 (In-Memory SQL Database)
-- **Security**: Spring Security with API Key Authentication
-- **Documentation**: OpenAPI 3 (Swagger)
-- **Containerization**: Docker & Docker Compose
-- **Testing**: JUnit 5, MockMvc, Testcontainers
-- **Build Tool**: Maven
-- **API Standard**: JSON API (https://jsonapi.org/)
+- Marco de trabajo Spring Boot 3.2.2
+- **Lenguaje**: Java 17
+- Base de datos H2 (Base de datos SQL en memoria)
+- **Seguridad**: Spring Security con autenticación de clave API
+- **Documentación**: OpenAPI 3 (Swagger)
+- **Contenedores**: Docker y Docker Compose
+- **Pruebas**: JUnit 5, MockMvc, Testcontainers
+- **Herramienta de compilación**: Maven
+- **API estándar**: API JSON (https://jsonapi.org/)
 
-## Services Description
+## Descripción de Servicios
 
-### 1. Products Service (Port 8080)
+### 1. Servicio de Productos (Puerto 8080)
 
-**Responsibilities:**
-- Product creation and management
-- Product information retrieval
-- Product catalog maintenance
+**Responsabilidades:**
+- Creación y gestión de productos
+- Recuperación de información de productos
+- Mantenimiento del catálogo de productos
 
-**Endpoints:**
-- `POST /api/products` - Create a new product
-- `GET /api/products/{id}` - Get product by ID
-- `GET /api/products` - List all products
+**Puntos finales:**
+- `POST /api/products` - Crear un nuevo producto
+- `GET /api/products/{id}` - Obtener producto por ID
+- `GET /api/products` - Listar todos los productos
 
 **Model:**
 ```java
 Product {
-    Long id;
-    String name;
-    BigDecimal price;
-    String description; // optional
+ Long id;
+ String name;
+ BigDecimal price;
+ String description; // optional
 }
 ```
 
-### 2. Inventory Service (Port 8081)
+### 2. Servicio de Inventario (Puerto 8081)
 
-**Responsibilities:**
-- Inventory quantity management
-- Purchase processing (chosen location)
-- Purchase history tracking
-- Inter-service communication with Products Service
+**Responsabilidades:**
+- Gestión de la cantidad de inventario
+- Procesamiento de compras (ubicación elegida)
+- Seguimiento del historial de compras
+- Comunicación interservicios con el Servicio de Productos
 
-**Endpoints:**
-- `GET /api/inventory/products/{productId}` - Get inventory by product ID
-- `PUT /api/inventory/products/{productId}` - Update inventory quantity
-- `POST /api/purchases` - Process purchase (main endpoint)
+**Puntos finales:**
+- `GET /api/inventory/products/{productId}` - Obtener inventario por ID de producto
+- `PUT /api/inventory/products/{productId}` - Actualizar cantidad de inventario
+- `POST /api/purchases` - Procesar compra (punto final principal)
 
 **Models:**
 ```java
 Inventory {
-    Long id;
-    Long productId;
-    Integer quantity;
+ Long id;
+ Long productId;
+ Integer quantity;
 }
 
 Purchase {
-    Long id;
-    Long productId;
-    Integer quantity;
-    BigDecimal totalPrice;
-    LocalDateTime purchaseDate;
+ Long id;
+ Long productId;
+ Integer quantity;
+ BigDecimal totalPrice;
+ LocalDateTime purchaseDate;
 }
 ```
 
-## Purchase Flow Design
+## Diseño del Flujo de Compra
 
-### Decision: Purchase Endpoint Location
+### Decisión: Purchase Endpoint Location
 
-**Chosen Location: Inventory Service**
+**Ubicación elegida: Servicio de Inventario**
 
-**Justification:**
-1. **Single Responsibility**: Inventory service owns stock management
-2. **Data Consistency**: Purchase and inventory updates happen in the same transaction
-3. **Reduced Coupling**: Products service remains focused on product management
-4. **Business Logic Alignment**: Purchase is fundamentally an inventory operation
+**Justificación:**
+1. **Responsabilidad única**: El servicio de inventario es el propietario de la gestión de existencias
+2. **Consistencia de los datos**: Las actualizaciones de compras e inventario se producen en la misma transacción
+3. **Acoplamiento reducido**: El servicio de productos sigue centrado en la gestión de productos
+4. **Alineación de la lógica empresarial**: La compra es fundamentalmente una operación de inventario
 
-### Purchase Process Flow
+### Flujo del proceso de compra
 
 ```
-1. Client sends purchase request
-   ↓
-2. Inventory Service validates product existence (calls Products Service)
-   ↓
-3. Check inventory availability
-   ↓
-4. If sufficient stock:
-   a) Decrease inventory quantity
-   b) Calculate total price
-   c) Create purchase record
-   d) Return purchase confirmation
-   ↓
-5. If insufficient stock or product not found:
-   Return appropriate error response
+1. Cliente envía solicitud de compra
+ ↓
+2. El Servicio de Inventario valida la existencia del producto (llama al Servicio de Productos)
+ ↓
+3. Comprueba disponibilidad de inventario
+ ↓
+4. Si hay existencias suficientes:
+   a) Disminuye la cantidad de inventario
+   b) Calcula el precio total
+   c) Crear registro de compra
+   d) Devolver confirmación de compra
+ ↓
+5. Si no hay existencias suficientes o no se encuentra el producto
+   Devolver respuesta de error apropiada
 ```
 
-### Error Handling
+### Tratamiento de errores
 
-- **Product Not Found (404)**: When product doesn't exist in Products Service
-- **Insufficient Inventory (400)**: When requested quantity exceeds available stock
-- **Validation Errors (400)**: Invalid input data
-- **Service Communication Errors (500)**: Products Service unavailable
+- Producto no encontrado (404)**: Cuando el producto no existe en el Servicio de Productos
+- Inventario insuficiente (400)**: Cuando la cantidad solicitada excede el stock disponible
+- Errores de validación (400)**: Datos de entrada no válidos
+- Errores de comunicación del servicio (500)**: Servicio de productos no disponible
 
-## Installation & Setup
+## Instalación y configuración
 
-### Prerequisites
+### Requisitos previos
 
 - Java 17+
 - Maven 3.8+
-- Docker & Docker Compose
+- Docker y Docker Compose
 
-### Local Development Setup
+### Configuración de desarrollo local
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd spring-microservices
-   ```
+1. **Clone el repositorio**
+ ```bash
+ git clone <repository-url>
+ cd spring-microservices
+ ```
 
-2. **Build the services**
-   ```bash
-   # Products Service
-   cd products-service
-   mvn clean package
-   cd ..
+2. **Construir los servicios**
+ ```bash
+   # Servicio de productos
+ cd products-service
+ mvn clean package
+ cd ..
    
    # Inventory Service
-   cd inventory-service
-   mvn clean package
-   cd ..
-   ```
+ cd inventory-service
+ mvn clean package
+ cd ..
+ ```
 
-3. **Run with Docker Compose**
-   ```bash
-   docker-compose up --build
-   ```
+3. **Ejecutar con Docker Compose**
+ ```bash
+ docker-compose up --build
+ ```
 
-4. **Verify services are running**
-   - Products Service: http://localhost:8080/actuator/health
-   - Inventory Service: http://localhost:8081/actuator/health
+4. **Verificar que los servicios se están ejecutando**
+   - Servicio de productos: http://localhost:8080/actuator/health
+   - Servicio de inventario: http://localhost:8081/actuator/health
 
-### Manual Setup (Development)
+### Configuración Manual (Desarrollo)
 
-1. **Start Products Service**
-   ```bash
-   cd products-service
-   mvn spring-boot:run
-   ```
+1. **Iniciar el servicio de productos**
+ ```bash
+ cd products-service
+ mvn spring-boot:run
+ ```
 
-2. **Start Inventory Service**
-   ```bash
-   cd inventory-service
-   mvn spring-boot:run
-   ```
+2. 2. **Iniciar Servicio de Inventario**
+ ```bash
+ cd inventory-service
+ mvn spring-boot:run
+ ```
 
-## API Documentation
+## Documentación API
 
-### OpenAPI/Swagger Documentation
+### Documentación OpenAPI/Swagger
 
-Once services are running, access the interactive API documentation:
+Una vez que los servicios se estén ejecutando, acceda a la documentación interactiva de la API:
 
-- **Products Service**: http://localhost:8080/swagger-ui/index.html
-- **Inventory Service**: http://localhost:8081/swagger-ui/index.html
+- **Servicio de productos**: http://localhost:8080/swagger-ui/index.html
+- **Servicio de inventario**: http://localhost:8081/swagger-ui/index.html
 
-### Authentication
+### Autenticación
 
-All API endpoints require API Key authentication via `X-API-Key` header:
 
-- **Products Service**: `products-service-api-key-123`
-- **Inventory Service**: `inventory-service-api-key-456`
+Todos API endpoints requieren la autenticación de la clave de la API mediante el encabezado `X-API-Key`:
 
-### Sample API Calls
+- Servicio de productos `products-service-api-key-123`.
+- Servicio de inventario: clave API 456
 
-#### Create a Product
-```bash
-curl -X POST http://localhost:8080/api/products \
-  -H "X-API-Key: products-service-api-key-123" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "data": {
-      "type": "product",
-      "attributes": {
-        "name": "Gaming Laptop",
-        "price": 1299.99,
-        "description": "High-performance gaming laptop"
-      }
-    }
-  }'
-```
 
-#### Update Inventory
-```bash
-curl -X PUT http://localhost:8081/api/inventory/products/1 \
-  -H "X-API-Key: inventory-service-api-key-456" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "data": {
-      "type": "inventory",
-      "attributes": {
-        "productId": 1,
-        "quantity": 50
-      }
-    }
-  }'
-```
+### Cobertura de las pruebas
 
-#### Process Purchase
-```bash
-curl -X POST http://localhost:8081/api/purchases \
-  -H "X-API-Key: inventory-service-api-key-456" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "data": {
-      "type": "purchase-request",
-      "attributes": {
-        "productId": 1,
-        "quantity": 2
-      }
-    }
-  }'
-```
+El proyecto incluye pruebas exhaustivas:
 
-## Testing
+- **Pruebas unitarias**: Lógica de la capa de servicio, reglas de negocio
+- **Pruebas de integración**: Pruebas de API de extremo a extremo
+- **Pruebas de controlador**: Pruebas de la capa HTTP con MockMvc.
+- **Objetivo de cobertura**: ≥ 80%.
 
-### Running Tests
+### Categorías de pruebas
 
-```bash
-# Products Service Tests
-cd products-service
-mvn test
+1. **Pruebas de gestión de productos**
+   - Validación de la creación de productos
+   - Funcionalidad de recuperación de productos
+   - Escenarios de gestión de errores
 
-# Inventory Service Tests
-cd inventory-service
-mvn test
+2. **Pruebas de gestión de inventario**
+   - Actualizaciones y consultas de inventario
+   - Comprobación de la disponibilidad de existencias
+   - Comunicación entre servicios
 
-# Run all tests with coverage
-mvn test jacoco:report
-```
+3. **Pruebas de flujo de compras**
+   - Procesamiento completo de la compra
+   - Gestión de existencias insuficiente
+   - Escenarios de producto no encontrado
+   - Pruebas de reversión de transacciones
 
-### Test Coverage
+## Monitorización y Comprobaciones de Salud
 
-The project includes comprehensive testing:
+### Puntos finales de salud
 
-- **Unit Tests**: Service layer logic, business rules
-- **Integration Tests**: End-to-end API testing
-- **Controller Tests**: HTTP layer testing with MockMvc
-- **Coverage Target**: ≥ 80%
+- Servicio de productos: http://localhost:8080/actuator/health
+- Servicio de inventario: http://localhost:8081/actuator/health
 
-### Test Categories
+### Métricas & Monitorización
 
-1. **Product Management Tests**
-   - Product creation validation
-   - Product retrieval functionality
-   - Error handling scenarios
+- **Puntos finales del actuador**: `/actuator/metrics`, `/actuator/info`
+- **Registro estructurado**: Registros en formato JSON con ID de correlación
+- **Indicadores de salud personalizados**: Comprobaciones de salud específicas del servicio
 
-2. **Inventory Management Tests**
-   - Inventory updates and queries
-   - Stock availability checks
-   - Cross-service communication
+### Configuración de registros
 
-3. **Purchase Flow Tests**
-   - Complete purchase processing
-   - Insufficient inventory handling
-   - Product not found scenarios
-   - Transaction rollback testing
+- **Desarrollo**: Salida de consola con nivel DEBUG
+- **Producción**: Registro basado en archivos con rotación
+- **Formato**: Registro estructurado con marcas de tiempo y contexto de servicio
 
-## Monitoring & Health Checks
+## Decisiones técnicas
 
-### Health Endpoints
+### 1. Elección de base de datos: Base de datos H2 SQL
 
-- **Products Service**: http://localhost:8080/actuator/health
-- **Inventory Service**: http://localhost:8081/actuator/health
 
-### Metrics & Monitoring
 
-- **Actuator Endpoints**: `/actuator/metrics`, `/actuator/info`
-- **Structured Logging**: JSON formatted logs with correlation IDs
-- **Custom Health Indicators**: Service-specific health checks
+**Justificación**
+- **Datos estructurados**: Modelo relacional claro (Productos ↔ Inventario ↔ Compras).
+- **Cumplimiento deACID**: Esencial para las transacciones de compra
+- **Simplicidad de desarrollo**: Cero configuración, pruebas sencillas
+- **Preparado para producción**: Fácil migración a PostgreSQL/MySQL
 
-### Logging Configuration
+### 2. Ubicación del punto final de compra: Servicio de Inventario
 
-- **Development**: Console output with DEBUG level
-- **Production**: File-based logging with rotation
-- **Format**: Structured logging with timestamps and service context
+**Justificación**
+- **Alineación de la lógica de negocio**: La compra es fundamentalmente una operación de inventario
+- **Consistencia de datos**: Una única transacción para la actualización del inventario y la creación de la compra
+- **Límites del servicio**: Mantiene responsabilidades de servicio claras
+- **Acoplamiento reducido**: El servicio de productos se mantiene centrado en la gestión del producto
 
-## Technical Decisions
+### 3. Implementación del estándar API JSON
 
-### 1. Database Choice: H2 SQL Database
+**Justificación**
+- **Estandarización**: Formato API estándar del sector
+- **Coherencia**: Estructura de respuesta uniforme en todos los puntos finales
+- **Gestión de errores**: Respuestas de error estructuradas
+- **A prueba de futuro**: Fácil integración con frameworks frontend
 
-**Rationale:**
-- **Structured Data**: Clear relational model (Products ↔ Inventory ↔ Purchases)
-- **ACID Compliance**: Essential for purchase transactions
-- **Development Simplicity**: Zero configuration, easy testing
-- **Production Ready**: Easy migration to PostgreSQL/MySQL
+### 4. Autenticación mediante clave API
 
-### 2. Purchase Endpoint Location: Inventory Service
+**Justificación**
+- **Simplicidad**: Fácil de implementar y probar
+- **Servicio-a-Servicio**: Apropiado para la comunicación entre microservicios
+- **Sin estado**: No requiere gestión de sesiones
+- **Escalable**: Fácil de extender con autenticación más sofisticada
 
-**Rationale:**
-- **Business Logic Alignment**: Purchase is fundamentally an inventory operation
-- **Data Consistency**: Single transaction for inventory update and purchase creation
-- **Service Boundaries**: Maintains clear service responsibilities
-- **Reduced Coupling**: Products service stays focused on product management
+### 5. Estrategia de tiempo de espera y reintento
 
-### 3. JSON API Standard Implementation
-
-**Rationale:**
-- **Standardization**: Industry-standard API format
-- **Consistency**: Uniform response structure across all endpoints
-- **Error Handling**: Structured error responses
-- **Future-Proof**: Easy integration with frontend frameworks
-
-### 4. API Key Authentication
-
-**Rationale:**
-- **Simplicity**: Easy to implement and test
-- **Service-to-Service**: Appropriate for microservice communication
-- **Stateless**: No session management required
-- **Scalable**: Easy to extend with more sophisticated auth later
-
-### 5. Timeout and Retry Strategy
-
-**Implementation:**
-- **HTTP Client Timeouts**: 10-second timeout for service calls
-- **Retry Logic**: 3 retry attempts with exponential backoff
-- **Circuit Breaker Pattern**: Ready for implementation if needed
+**Implementación:**
+- **Tiempo de espera del cliente HTTP**: Tiempo de espera de 10 segundos para llamadas de servicio
+- **Lógica de reintentos**: 3 intentos de reintento con backoff exponencial
+- **Patrón de interrupción del circuito**: Listo para ser implementado si es necesario
 
 ## AI Tools Usage
 
-### Tools Utilized
 
-1. **Claude Code (Primary Assistant)**
-   - **Architecture Design**: Microservice structure and communication patterns
-   - **Code Generation**: Complete service implementations following best practices
-   - **Test Creation**: Comprehensive unit and integration test suites
-   - **Configuration**: Docker, logging, and monitoring setup
+### Herramientas utilizadas
 
-2. **Code Quality Verification Methods**
+1. **Código Claude (Asistente principal)**
+   - **Diseño de la arquitectura**: Estructura de microservicios y patrones de comunicación
+   - **Generación de código**: Implementaciones completas de servicios siguiendo las mejores prácticas
+   - **Creación de pruebas**: Completas suites de pruebas unitarias y de integración
+   - **Configuración**: Configuración de Docker, registro y monitorización.
 
-   **Static Analysis:**
-   - Code review for Spring Boot best practices
-   - Design pattern implementation verification
-   - Security vulnerability assessment
+2. **Métodos de verificación de la calidad del código**
 
-   **Testing Verification:**
-   - Unit test coverage analysis
-   - Integration test scenario validation
-   - Mock implementation correctness
+   **Análisis estático**
+   - Revisión del código para las mejores prácticas de Spring Boot
+   - Verificación de implementación de patrones de diseño
+   - Evaluación de vulnerabilidades de seguridad
 
-   **Architectural Review:**
-   - Service boundary validation
-   - API design consistency check
-   - Database design normalization
+   **Verificación de pruebas**
+   - Análisis de cobertura de pruebas unitarias
+   - Validación de escenarios de pruebas de integración
+   - Corrección de la implementación simulada
 
-### Specific AI Contributions
+   **Revisión arquitectónica:**
+   - Validación de los límites del servicio
+   - Comprobación de la coherencia del diseño de la API
+   - Normalización del diseño de la base de datos
 
-1. **Service Implementation**
-   - Generated complete REST controllers with JSON API compliance
-   - Implemented comprehensive error handling
-   - Created robust service layer with transaction management
+### Contribuciones específicas de AI
 
-2. **Testing Strategy**
-   - Generated unit tests covering all business logic scenarios
-   - Created integration tests for end-to-end workflows
-   - Implemented test data builders and fixtures
+1. **Implementación de servicios**
+   - Generación de controladores REST completos con conformidad API JSON
+   - Implementación de la gestión integral de errores
+   - Creada capa de servicio robusta con gestión de transacciones
 
-3. **Configuration & DevOps**
-   - Docker containerization setup
-   - Logging configuration with environment-specific profiles
-   - Health check implementation
+2. **Estrategia de pruebas**
+   - Generación de pruebas unitarias que cubren todos los escenarios de lógica de negocio
+   - Creación de pruebas de integración para flujos de trabajo integrales
+   - Implementación de constructores de datos de prueba y accesorios
 
-4. **Documentation**
-   - OpenAPI specification generation
-   - Architecture diagram creation
-   - Comprehensive README documentation
+3. **Configuración y DevOps**
+   - Configuración de contenedores Docker
+   - Configuración de registro con perfiles específicos del entorno
+   - Implementación de Health Check
 
-### Quality Assurance Process
+4. **Documentación**
 
-1. **Code Review**: Manual review of all generated code for best practices
-2. **Test Execution**: All generated tests executed and validated
-3. **Integration Testing**: Manual testing of service interactions
-4. **Performance Validation**: Basic load testing of critical endpoints
-5. **Security Review**: API authentication and authorization validation
+
+   - Generación de especificaciones OpenAPI
+   - Creación de diagramas de arquitectura
+   - Amplia documentación README
+
+### Proceso de garantía de calidad
+
+1. **Revisión del código**: Revisión manual de todo el código generado para las mejores prácticas
+2. **Ejecución de pruebas**: Todas las pruebas generadas ejecutadas y validadas
+3. **Pruebas de integración**: Pruebas manuales de las interacciones de los servicios
+4. **Validación del rendimiento**: Pruebas básicas de carga de puntos finales críticos.
+5. **Revisión de seguridad**: Validación de autenticación y autorización de API
 
 ---
 
-## Getting Started Quick Guide
+## Guía rápida de inicio
 
-1. **Start Services**: `docker-compose up --build`
-2. **Create Product**: Use Swagger UI at http://localhost:8080/swagger-ui/index.html
-3. **Add Inventory**: Update inventory via http://localhost:8081/swagger-ui/index.html  
-4. **Process Purchase**: Make purchase through inventory service
-5. **Monitor Health**: Check http://localhost:8080/actuator/health and http://localhost:8081/actuator/health
+1. **Iniciar Servicios**: `docker-compose up --build`
+2. **Crear Producto**: Usar Swagger UI en http://localhost:8080/swagger-ui/index.html
+3. **Añadir Inventario**: Actualizar inventario a través de http://localhost:8081/swagger-ui/index.html
+4. **Procesar Compra**: Realizar la compra a través del servicio de inventario
+5. **Vigilar la salud**: Comprobar http://localhost:8080/actuator/health y http://localhost:8081/actuator/health
 
-For detailed API examples and advanced configuration, refer to the sections above.
+Para ejemplos detallados de API y configuración avanzada, consulte las secciones anteriores.
