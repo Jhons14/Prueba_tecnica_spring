@@ -10,7 +10,7 @@ Una completa implementación de arquitectura de microservicios que incluye gesti
 - Diseño del flujo de compras
 - Instalación y configuración
 - Documentación de la API
-- Pruebas
+- Ejecutar Pruebas
 - Supervisión y controles
 - Decisiones técnicas
 - Uso de herramientas de IA
@@ -159,7 +159,31 @@ Purchase {
 
 ### Requisitos previos
 
-- Docker y Docker Compose
+#### Para ejecutar con Docker (Recomendado)
+- Docker 20.0+ 
+- Docker Compose 2.0+
+
+#### Para desarrollo local (Opcional)
+- **Java Development Kit (JDK) 17** o superior
+- **Apache Maven 3.6+** para gestión de dependencias y construcción
+- **Git** para clonar el repositorio
+
+#### Verificar requisitos instalados
+
+```bash
+# Verificar Docker
+docker --version
+docker-compose --version
+
+# Verificar Java (si se ejecuta localmente)
+java -version
+
+# Verificar Maven (si se ejecuta localmente)
+mvn -version
+
+# Verificar Git
+git --version
+```
 
 ### Configuración de desarrollo local
 
@@ -212,34 +236,157 @@ Todos API endpoints requieren la autenticación de la clave de la API mediante e
 - Servicio de productos `products-service-api-key-123`.
 - Servicio de inventario: clave API 456
 
+## Ejecutar Pruebas
+
+### Requisitos para ejecutar las pruebas
+
+Para ejecutar las pruebas del proyecto, necesitas tener instalado:
+
+- **Java Development Kit (JDK) 17** o superior
+- **Apache Maven 3.6+** para gestión de dependencias y ejecución de pruebas
+
+#### Verificar requisitos para pruebas
+
+```bash
+# Verificar Java
+java -version
+# Debería mostrar: openjdk version "17.x.x" o superior
+
+# Verificar Maven
+mvn -version
+# Debería mostrar: Apache Maven 3.6.x o superior
+```
+
+### Comandos para ejecutar pruebas
+
+#### 1. Ejecutar todas las pruebas del proyecto
+
+```bash
+# Desde el directorio raíz del proyecto
+mvn test
+
+# O ejecutar pruebas en ambos servicios por separado
+cd products-service && mvn test
+cd ../inventory-service && mvn test
+```
+
+#### 2. Ejecutar pruebas de un servicio específico
+
+```bash
+# Solo pruebas del servicio de productos
+cd products-service
+mvn test
+
+# Solo pruebas del servicio de inventario
+cd inventory-service
+mvn test
+```
+
+#### 3. Ejecutar una clase de prueba específica
+
+```bash
+# Ejemplo: ejecutar solo las pruebas del controlador de productos
+cd products-service
+mvn test -Dtest=ProductControllerTest
+
+# Ejemplo: ejecutar solo las pruebas del servicio de inventario
+cd inventory-service
+mvn test -Dtest=InventoryServiceTest
+```
+
+#### 4. Ejecutar un método de prueba específico
+
+```bash
+# Ejemplo: ejecutar solo una prueba específica
+cd products-service
+mvn test -Dtest=ProductControllerTest#createProduct_WithValidInput_ShouldReturnCreatedProduct
+```
+
+#### 5. Ejecutar pruebas con reporte de cobertura
+
+```bash
+# Ejecutar pruebas y generar reporte de cobertura
+mvn clean test jacoco:report
+
+# Los reportes se generan en:
+# products-service/target/site/jacoco/index.html
+# inventory-service/target/site/jacoco/index.html
+```
+
+#### 6. Compilar y ejecutar pruebas
+
+```bash
+# Compilar el proyecto y ejecutar todas las pruebas
+mvn clean compile test
+
+# Compilar, ejecutar pruebas y empaquetar
+mvn clean package
+```
+
 ### Cobertura de las pruebas
 
 El proyecto incluye pruebas exhaustivas:
 
 - **Pruebas unitarias**: Lógica de la capa de servicio, reglas de negocio
 - **Pruebas de integración**: Pruebas de API de extremo a extremo
-- **Pruebas de controlador**: Pruebas de la capa HTTP con MockMvc.
-- **Objetivo de cobertura**: ≥ 80%.
+- **Pruebas de controlador**: Pruebas de la capa HTTP con MockMvc
+- **Objetivo de cobertura**: ≥ 80%
 
 ### Categorías de pruebas
 
-1. **Pruebas de gestión de productos**
+1. **Pruebas de gestión de productos** (`ProductControllerTest`, `ProductServiceTest`)
 
-   - Validación de la creación de productos
+   - Validación de la creación de productos con datos válidos e inválidos
    - Funcionalidad de recuperación de productos
-   - Escenarios de gestión de errores
+   - Validación de precios negativos y cero
+   - Escenarios de gestión de errores y manejo de excepciones
 
-2. **Pruebas de gestión de inventario**
+2. **Pruebas de gestión de inventario** (`InventoryControllerTest`, `InventoryServiceTest`)
 
    - Actualizaciones y consultas de inventario
    - Comprobación de la disponibilidad de existencias
-   - Comunicación entre servicios
+   - Comunicación entre servicios (Products Service)
 
-3. **Pruebas de flujo de compras**
+3. **Pruebas de flujo de compras** (`PurchaseControllerTest`, `PurchaseServiceTest`)
    - Procesamiento completo de la compra
    - Gestión de existencias insuficiente
    - Escenarios de producto no encontrado
+   - Validación de datos de entrada
    - Pruebas de reversión de transacciones
+
+### Solución de problemas comunes
+
+#### Error: "JAVA_HOME not set"
+```bash
+# En Linux/Mac
+export JAVA_HOME=/path/to/your/jdk17
+export PATH=$JAVA_HOME/bin:$PATH
+
+# En Windows
+set JAVA_HOME=C:\path\to\your\jdk17
+set PATH=%JAVA_HOME%\bin;%PATH%
+```
+
+#### Error: "mvn command not found"
+```bash
+# Instalar Maven en Ubuntu/Debian
+sudo apt update && sudo apt install maven
+
+# Instalar Maven en Mac con Homebrew
+brew install maven
+
+# En Windows, descargar desde https://maven.apache.org/install.html
+```
+
+#### Pruebas fallan por puertos ocupados
+```bash
+# Verificar si hay procesos usando los puertos 8080/8081
+lsof -i :8080
+lsof -i :8081
+
+# Detener servicios que puedan estar ejecutándose
+docker-compose down
+```
 
 ## Monitorización y Comprobaciones de Salud
 
